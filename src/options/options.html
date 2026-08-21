@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Stylespec — settings</title>
+    <script src="../shared/theme.js"></script>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 3C6.9 3 3 6.3 3 10.4c0 2.3 1.2 4.3 3.2 5.7L5.4 20l3.9-2a11 11 0 0 0 2.7.3c5.1 0 9-3.3 9-7.4S17.1 3 12 3Z"
+            />
+          </svg>
+        </span>
+        <div>
+          <h1>Stylespec</h1>
+          <p>Response style presets for any AI chat</p>
+        </div>
+      </div>
+      <div class="topbar__actions">
+        <span class="savestate" id="saveState" role="status" aria-live="polite"></span>
+        <button class="btn btn--primary" id="newStyle" type="button">New style</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="sidebar">
+        <div class="sidebar__search">
+          <input id="filter" type="search" placeholder="Filter styles" aria-label="Filter styles" />
+        </div>
+        <nav class="stylelist" id="styleList" aria-label="Styles"></nav>
+        <button class="sidebar__prefs" id="prefsBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2v.2a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.9H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" />
+          </svg>
+          Preferences
+        </button>
+      </aside>
+
+      <section class="pane" id="pane" aria-live="polite"></section>
+    </main>
+
+    <script src="../shared/presets.js"></script>
+    <script src="../shared/compose.js"></script>
+    <script src="../shared/storage.js"></script>
+    <script src="../shared/providers.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>

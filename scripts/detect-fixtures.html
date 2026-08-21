@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Stylespec — detection fixtures</title>
+    <style>
+      body {
+        margin: 0;
+        font: 14px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+        background: #101216;
+        color: #e6e8ee;
+      }
+      #stage {
+        position: fixed;
+        inset: 0;
+        background: #fff;
+        color: #111;
+        font-family: system-ui, sans-serif;
+      }
+      #stage[hidden] {
+        display: none;
+      }
+      #out {
+        position: relative;
+        z-index: 2;
+        padding: 20px;
+        white-space: pre;
+      }
+      .pass {
+        color: #4ade80;
+      }
+      .fail {
+        color: #f87171;
+      }
+      h1 {
+        font-size: 16px;
+        margin: 0 0 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="stage"></div>
+    <div id="out"></div>
+
+    <script src="../src/content/detect.js"></script>
+    <script>
+      /* Each fixture is rendered alone into a viewport-sized stage, so the
+         layout signals detect.js relies on (size, position on screen) are
+         realistic rather than an artifact of stacking fixtures together. */
+      const CHAT_SHELL = (inner) => `
+        <div style="min-height:100vh;display:flex;flex-direction:column;padding:16px">
+          <div style="flex:1"></div>
+          ${inner}
+        </div>`;
+
+      const FIXTURES = [
+        {
+          name: 'ChatGPT-style ProseMirror composer',
+          expect: true,
+          selector: '#prompt-textarea',
+          html: CHAT_SHELL(`
+            <form style="display:flex;gap:8px;border:1px solid #ccc;border-radius:24px;padding:12px">
+              <div id="prompt-textarea" class="ProseMirror" contenteditable="true" role="textbox"
+                   style="flex:1;min-height:26px">
+                <p data-placeholder="Ask anything"></p>
+              </div>
+              <button data-testid="send-button" aria-label="Send prompt">^</button>
+            </form>`),
+        },
+        {
+          name: 'Gemini-style Quill composer',
+          expect: true,
+          selector: '.ql-editor',
+          html: CHAT_SHELL(`
+            <rich-textarea style="display:flex;gap:8px;border:1px solid #ccc;border-radius:24px;padding:12px">
+              <div class="ql-editor" contenteditable="true" role="textbox"
+                   data-placeholder="Ask Gemini" style="flex:1;min-height:26px"></div>
+              <button aria-label="Send message">&gt;</button>
+            </rich-textarea>`),
+        },
+        {
+          name: 'Unknown AI app, plain textarea',
+          expect: true,
+          selector: 'textarea',
+          html: CHAT_SHELL(`
+            <div style="display:flex;gap:8px">
+              <textarea placeholder="Send a message" style="flex:1;height:64px"></textarea>
+              <button type="submit">Send</button>
+            </div>`),
+        },
+        {
+          name: 'Support chat widget (accepted trade-off)',
+          expect: true,
+          selector: 'textarea',
+          html: CHAT_SHELL(`
+            <div style="display:flex;gap:8px;width:340px;margin-left:auto">
+              <textarea placeholder="Type your message" style="flex:1;height:52px"></textarea>
+              <button aria-label="Send">-&gt;</button>
+            </div>`),
+        },
+        {
+          name: 'Search box',
+          expect: false,
+          selector: 'input',
+          html: `<div style="padding:90px;text-align:center">
+                   <input type="text" name="q" aria-label="Search" style="width:520px;height:44px">
+                   <div style="margin-top:16px"><button>Search</button></div>
+                 </div>`,
+        },
+        {
+          name: 'Login form',
+          expect: false,
+          selector: 'input[name=username]',
+          html: `<form style="padding:80px;display:grid;gap:10px;width:320px">
+                   <input type="text" name="username" placeholder="Username" style="height:38px">
+                   <input type="password" placeholder="Password" style="height:38px">
+                   <button type="submit">Sign in</button>
+                 </form>`,
+        },
+        {
+          name: 'Contact form message box',
+          expect: false,
+          selector: 'textarea',
+          html: `<form style="padding:60px;display:grid;gap:10px;width:520px">
+                   <input type="text" placeholder="Your name" style="height:38px">
+                   <textarea placeholder="Your message" style="height:130px"></textarea>
+                   <button type="submit">Submit</button>
+                 </form>`,
+        },
+        {
+          name: 'Contact form on an AI company site',
+          expect: false,
+          title: 'Contact us — Anthropic',
+          selector: 'textarea',
+          html: `<form style="padding:60px;display:grid;gap:10px;width:520px">
+                   <input type="text" placeholder="Your name" style="height:38px">
+                   <textarea placeholder="Your message" style="height:130px"></textarea>
+                   <button type="submit">Submit</button>
+                 </form>`,
+        },
+        {
+          name: 'Search box on an AI-branded page',
+          expect: false,
+          title: 'Claude Docs',
+          selector: 'input',
+          html: `<header style="padding:20px;border-bottom:1px solid #ddd">
+                   <input type="search" placeholder="Search documentation" style="width:420px;height:36px">
+                 </header>
+                 <div style="padding:40px">Documentation body</div>`,
+        },
+        {
+          /* Rebuilt from auto.complete.so's own bundle. Nothing names this as
+           * AI: the placeholder matches no hint pattern, the host and title are
+           * silent, and the composer is centred rather than docked because the
+           * session is empty. Only the chat controls around it give it away. */
+          name: 'AI app that never says "AI" anywhere',
+          expect: true,
+          title: 'Autocomplete',
+          selector: 'textarea',
+          html: `<button aria-label="Open chat history" style="position:fixed;top:12px;left:8px;width:32px;height:32px"></button>
+                 <div style="max-width:760px;margin:0 auto;padding-top:300px">
+                   <div style="border:1px solid #ddd;border-radius:6px;padding:16px">
+                     <div style="min-width:0">
+                       <textarea rows="1" placeholder="Tell Autocomplete what you want to do, or bring your own data to begin..." style="width:100%;height:24px;resize:none;border:none"></textarea>
+                     </div>
+                     <div style="display:flex;justify-content:space-between;margin-top:12px">
+                       <button aria-label="Attach files">+</button>
+                       <button aria-label="Send message">↑</button>
+                     </div>
+                   </div>
+                 </div>`,
+        },
+        {
+          /* A contact section built from divs rather than a form, with "Send
+           * message" on the button. Everything reads as a composer except the
+           * name field beside it. */
+          name: 'Div-built contact block with a Send button',
+          expect: false,
+          title: 'Contact us',
+          selector: 'textarea',
+          html: `<div style="padding:60px;display:grid;gap:10px;width:520px">
+                   <input type="text" placeholder="Your name" style="height:38px">
+                   <textarea placeholder="Your message" style="height:130px"></textarea>
+                   <button aria-label="Send message">Send message</button>
+                 </div>`,
+        },
+        {
+          /* The shape of an unbranded AI product: nothing in the hostname,
+           * title or placeholder says "AI", so only the composer layout can
+           * carry it. */
+          name: 'Unbranded AI app with a neutral placeholder',
+          expect: true,
+          title: 'Complete',
+          selector: 'textarea',
+          html: `<div style="padding:20px">Session history</div>
+                 <div style="position:fixed;left:10%;right:10%;bottom:24px;display:flex;gap:8px">
+                   <textarea placeholder="Describe what you want to build" style="flex:1;height:56px"></textarea>
+                   <button aria-label="Send">↑</button>
+                 </div>`,
+        },
+        {
+          name: 'Bottom-docked notes box with no send control',
+          expect: false,
+          title: 'Scratchpad',
+          selector: 'textarea',
+          html: `<div style="padding:20px">Notes</div>
+                 <div style="position:fixed;left:10%;right:10%;bottom:24px">
+                   <textarea placeholder="Jot something down" style="width:100%;height:56px"></textarea>
+                 </div>`,
+        },
+        {
+          name: 'Comment box on an AI blog',
+          expect: false,
+          title: 'AI news roundup',
+          selector: 'textarea',
+          html: `<article style="padding:40px">Post body</article>
+                 <section style="padding:0 40px 40px;width:600px">
+                   <textarea placeholder="Add a comment" style="width:100%;height:90px"></textarea>
+                   <button>Post comment</button>
+                 </section>`,
+        },
+      ];
+
+      const stage = document.getElementById('stage');
+      const out = document.getElementById('out');
+      const frame = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+      (async function run() {
+        const lines = [];
+        let passed = 0;
+
+        for (const fixture of FIXTURES) {
+          document.title = fixture.title || 'Detection fixtures';
+          stage.innerHTML = fixture.html;
+          await frame();
+
+          const el = stage.querySelector(fixture.selector);
+          const result = el ? SayWhat.detect.score(el) : null;
+          const got = el ? SayWhat.detect.isChatInput(el) : null;
+          const ok = got === fixture.expect;
+          if (ok) passed += 1;
+
+          lines.push(
+            `${ok ? 'PASS' : 'FAIL'}  ${fixture.name}\n` +
+              `        expected ${fixture.expect}, got ${got}` +
+              (result
+                ? `  (score ${result.score}, threshold ${SayWhat.detect.THRESHOLD}, aiEvidence ${result.aiEvidence}, kind ${result.kind})`
+                : '  (element not found)')
+          );
+        }
+
+        stage.hidden = true;
+        document.title = `${passed}/${FIXTURES.length} detection fixtures pass`;
+
+        const heading = document.createElement('h1');
+        heading.textContent = document.title;
+        heading.className = passed === FIXTURES.length ? 'pass' : 'fail';
+        out.append(heading);
+
+        for (const line of lines) {
+          const node = document.createElement('div');
+          node.textContent = line;
+          node.className = line.startsWith('PASS') ? 'pass' : 'fail';
+          out.append(node);
+        }
+      })();
+    </script>
+  </body>
+</html>

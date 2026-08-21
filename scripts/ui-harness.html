@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Stylespec — UI harness</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        font-family: system-ui, -apple-system, sans-serif;
+        background: #f7f7f8;
+        color: #16181d;
+      }
+      .transcript {
+        flex: 1;
+        padding: 40px 20px;
+        max-width: 720px;
+        margin: 0 auto;
+        width: 100%;
+        color: #666;
+      }
+      .composer {
+        position: sticky;
+        bottom: 0;
+        max-width: 720px;
+        width: 100%;
+        margin: 0 auto 28px;
+        display: flex;
+        gap: 8px;
+        align-items: flex-end;
+        padding: 12px;
+        background: #fff;
+        border: 1px solid #d9d9e3;
+        border-radius: 26px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+      }
+      #composer {
+        flex: 1;
+        min-height: 28px;
+        max-height: 200px;
+        overflow-y: auto;
+        outline: none;
+        padding: 3px 6px;
+        white-space: pre-wrap;
+      }
+      #composer:empty::before {
+        content: attr(data-placeholder);
+        color: #9b9ba5;
+      }
+      .send {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 0;
+        background: #16181d;
+        color: #fff;
+        cursor: pointer;
+        flex: none;
+      }
+      /* An empty chat centres its composer instead of docking it at the
+         bottom, which leaves no room to open the panel upwards. */
+      body.blank {
+        justify-content: center;
+      }
+      body.blank .transcript {
+        flex: none;
+        text-align: center;
+        font-size: 26px;
+        color: #16181d;
+        padding-bottom: 16px;
+      }
+      body.blank .composer {
+        position: static;
+        margin-bottom: 0;
+      }
+      .layout {
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        font: 12px system-ui, sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <button class="layout" onclick="document.body.classList.toggle('blank')">
+      toggle blank / docked composer
+    </button>
+
+    <div class="transcript">
+      Fake AI chat transcript. The composer below mimics a ProseMirror-style rich editor.
+    </div>
+
+    <div class="composer">
+      <div
+        id="composer"
+        class="ProseMirror"
+        contenteditable="true"
+        role="textbox"
+        data-placeholder="Ask anything"
+      ></div>
+      <button class="send" data-testid="send-button" aria-label="Send prompt">^</button>
+    </div>
+
+    <script>
+      /* Minimal extension API surface, so the real content scripts run unmodified. */
+      const store = {};
+      window.chrome = {
+        runtime: {
+          getURL: (p) => '/' + p,
+          onMessage: { addListener() {} },
+          sendMessage: (message) => {
+            /* Enough of the worker for the multiplexer to be exercised here:
+               nothing to relay into this tab, and a fan-out that reports back
+               as if the tabs had opened. */
+            if (message && message.type === 'sw:claim-relay') {
+              return Promise.resolve({ job: null });
+            }
+            if (message && message.type === 'sw:multiplex') {
+              console.log('[harness] fan-out', message.providerIds, message.prompt);
+              return Promise.resolve({ opened: message.providerIds, skipped: [] });
+            }
+            return Promise.resolve({ ok: true });
+          },
+        },
+        storage: {
+          sync: {
+            get: () => Promise.resolve(Object.assign({}, store)),
+            set: (patch) => {
+              Object.assign(store, patch);
+              return Promise.resolve();
+            },
+          },
+          onChanged: { addListener() {} },
+        },
+      };
+    </script>
+
+    <script src="../src/shared/presets.js"></script>
+    <script src="../src/shared/compose.js"></script>
+    <script src="../src/shared/storage.js"></script>
+    <script src="../src/shared/providers.js"></script>
+    <script src="../src/content/detect.js"></script>
+    <script src="../src/content/insert.js"></script>
+    <script src="../src/content/submit.js"></script>
+    <script src="../src/content/ui.css.js"></script>
+    <script src="../src/content/ui.js"></script>
+    <script src="../src/content/relay.js"></script>
+    <script src="../src/content/index.js"></script>
+
+    <script>
+      /* Drive the extension the way a user would, for screenshot verification. */
+      window.harness = {
+        type(text) {
+          const el = document.getElementById('composer');
+          el.focus();
+          el.textContent = text;
+          el.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText' }));
+        },
+        shadow() {
+          const host = document.querySelector('stylespec-root');
+          return host && host.shadowRoot;
+        },
+        click(selector) {
+          const node = this.shadow() && this.shadow().querySelector(selector);
+          if (!node) return `not found: ${selector}`;
+          node.click();
+          return 'clicked';
+        },
+        draft() {
+          return document.getElementById('composer').innerText;
+        },
+        blank(on) {
+          document.body.classList.toggle('blank', on !== false);
+        },
+        /* The regression this guards: the panel must not sit on the composer,
+           because the site's send button lives in there. */
+        overlap() {
+          const panel = this.shadow() && this.shadow().querySelector('.sw-panel');
+          if (!panel || panel.hidden) return 'panel not open';
+          const p = panel.getBoundingClientRect();
+          const c = document.querySelector('.composer').getBoundingClientRect();
+          const clear = p.bottom <= c.top || p.top >= c.bottom;
+          return { clear, panel: [p.top, p.bottom], composer: [c.top, c.bottom] };
+        },
+      };
+    </script>
+  </body>
+</html>

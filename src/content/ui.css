@@ -1,0 +1,517 @@
+/* Stylespec — in-page UI. Loaded into a shadow root, so nothing here can leak
+   into the host page and host page CSS cannot reach in. */
+
+:host {
+  all: initial;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.sw-root {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  pointer-events: none;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1.45;
+  color-scheme: light;
+
+  /* Must be set here, not only on .sw-pill and .sw-panel: the button reset
+     below uses `color: inherit` and outranks them on specificity, so without a
+     colour on the root every control would fall back to the `all: initial`
+     black from :host. */
+  color: var(--sw-fg);
+
+  --sw-accent: #6366f1;
+  --sw-accent-strong: #4f46e5;
+  --sw-accent-soft: rgba(99, 102, 241, 0.12);
+  --sw-bg: #ffffff;
+  --sw-bg-soft: #f6f7fb;
+  --sw-fg: #16181d;
+  --sw-fg-muted: #6b7180;
+  --sw-border: rgba(16, 18, 27, 0.11);
+  --sw-shadow: 0 12px 32px rgba(16, 18, 27, 0.16), 0 2px 6px rgba(16, 18, 27, 0.08);
+  --sw-toast-bg: #16181d;
+  --sw-toast-fg: #ffffff;
+  --sw-radius: 12px;
+}
+
+/* Theme is explicit rather than purely automatic, because the system setting
+   and the site's own theme often disagree — a dark macOS with Claude in light
+   mode being the common case. data-theme is set from the user's preference. */
+.sw-root[data-theme='dark'] {
+  color-scheme: dark;
+  --sw-accent: #818cf8;
+  --sw-accent-strong: #a5b4fc;
+  --sw-accent-soft: rgba(129, 140, 248, 0.18);
+  --sw-bg: #1b1d24;
+  --sw-bg-soft: #23262f;
+  --sw-fg: #eceef4;
+  --sw-fg-muted: #9aa1b1;
+  --sw-border: rgba(255, 255, 255, 0.12);
+  --sw-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.35);
+  --sw-toast-bg: #343846;
+  --sw-toast-fg: #f3f4f8;
+}
+
+@media (prefers-color-scheme: dark) {
+  .sw-root[data-theme='auto'] {
+    color-scheme: dark;
+    --sw-accent: #818cf8;
+    --sw-accent-strong: #a5b4fc;
+    --sw-accent-soft: rgba(129, 140, 248, 0.18);
+    --sw-bg: #1b1d24;
+    --sw-bg-soft: #23262f;
+    --sw-fg: #eceef4;
+    --sw-fg-muted: #9aa1b1;
+    --sw-border: rgba(255, 255, 255, 0.12);
+    --sw-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.35);
+    --sw-toast-bg: #343846;
+    --sw-toast-fg: #f3f4f8;
+  }
+}
+
+.sw-root button,
+.sw-root input,
+.sw-root select {
+  font: inherit;
+  color: inherit;
+}
+
+/* ---------------------------------------------------------------- pill --- */
+
+.sw-pill {
+  position: fixed;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 11px 0 8px;
+  border: 1px solid var(--sw-border);
+  border-radius: 999px;
+  background: var(--sw-bg);
+  color: var(--sw-fg);
+  box-shadow: 0 4px 14px rgba(16, 18, 27, 0.14);
+  cursor: pointer;
+  /* Only clickable once visible, so a faded-out pill cannot swallow clicks
+     meant for the page underneath it. */
+  pointer-events: none;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 550;
+  opacity: 0;
+  transform: translateY(4px) scale(0.96);
+  transition: opacity 140ms ease, transform 140ms ease, background 120ms ease;
+}
+
+.sw-pill[data-visible='true'] {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.sw-pill:hover {
+  background: var(--sw-bg-soft);
+  border-color: var(--sw-accent);
+}
+
+.sw-pill:focus-visible {
+  outline: 2px solid var(--sw-accent);
+  outline-offset: 2px;
+}
+
+.sw-pill__mark {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  border-radius: 5px;
+  background: linear-gradient(135deg, var(--sw-accent), #a855f7);
+  display: grid;
+  place-items: center;
+  color: #fff;
+}
+
+.sw-pill__mark svg {
+  width: 10px;
+  height: 10px;
+}
+
+.sw-pill__active {
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Armed multiplexer targets. The picker closes on apply, so this is the only
+   thing left telling you that sending is about to open tabs. */
+.sw-pill__badge {
+  flex: none;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--sw-accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 15px;
+}
+
+/* --------------------------------------------------------------- panel --- */
+
+.sw-panel {
+  position: fixed;
+  width: 344px;
+  max-height: 462px;
+  display: flex;
+  flex-direction: column;
+  background: var(--sw-bg);
+  color: var(--sw-fg);
+  border: 1px solid var(--sw-border);
+  border-radius: var(--sw-radius);
+  box-shadow: var(--sw-shadow);
+  pointer-events: auto;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(6px) scale(0.985);
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.sw-panel[data-visible='true'] {
+  opacity: 1;
+  transform: none;
+}
+
+.sw-panel[hidden] {
+  display: none;
+}
+
+.sw-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 10px 10px 13px;
+  border-bottom: 1px solid var(--sw-border);
+}
+
+.sw-head__title {
+  font-weight: 620;
+  font-size: 13px;
+  flex: 1;
+}
+
+.sw-head__title small {
+  display: block;
+  font-weight: 450;
+  font-size: 11px;
+  color: var(--sw-fg-muted);
+}
+
+.sw-icon-btn {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--sw-fg-muted);
+  cursor: pointer;
+}
+
+.sw-icon-btn:hover {
+  background: var(--sw-bg-soft);
+  color: var(--sw-fg);
+}
+
+.sw-icon-btn svg {
+  width: 15px;
+  height: 15px;
+}
+
+.sw-search {
+  padding: 9px 11px;
+  border-bottom: 1px solid var(--sw-border);
+}
+
+.sw-search input {
+  width: 100%;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--sw-border);
+  border-radius: 8px;
+  background: var(--sw-bg-soft);
+  outline: none;
+}
+
+.sw-search input:focus {
+  border-color: var(--sw-accent);
+  box-shadow: 0 0 0 3px var(--sw-accent-soft);
+}
+
+.sw-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px;
+  min-height: 90px;
+  overscroll-behavior: contain;
+}
+
+.sw-group {
+  padding: 8px 8px 4px;
+  font-size: 10.5px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sw-fg-muted);
+}
+
+.sw-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  width: 100%;
+  padding: 7px 9px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sw-item:hover,
+.sw-item[data-active='true'] {
+  background: var(--sw-accent-soft);
+}
+
+.sw-item__emoji {
+  font-size: 15px;
+  line-height: 1.25;
+  width: 19px;
+  flex: none;
+  text-align: center;
+}
+
+.sw-item__text {
+  min-width: 0;
+  flex: 1;
+}
+
+.sw-item__name {
+  font-weight: 560;
+  font-size: 12.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sw-item__blurb {
+  font-size: 11px;
+  color: var(--sw-fg-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sw-item__star {
+  flex: none;
+  color: var(--sw-accent);
+  opacity: 0.85;
+}
+
+.sw-item__star svg {
+  width: 12px;
+  height: 12px;
+}
+
+.sw-empty {
+  padding: 22px 14px;
+  text-align: center;
+  color: var(--sw-fg-muted);
+  font-size: 12px;
+}
+
+/* ----------------------------------------------------------- modifiers --- */
+
+.sw-mods {
+  border-top: 1px solid var(--sw-border);
+  background: var(--sw-bg-soft);
+}
+
+.sw-mods__toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px 12px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 11.5px;
+  font-weight: 560;
+  color: var(--sw-fg-muted);
+}
+
+.sw-mods__toggle:hover {
+  color: var(--sw-fg);
+}
+
+.sw-mods__chevron {
+  transition: transform 140ms ease;
+}
+
+.sw-mods[data-open='true'] .sw-mods__chevron {
+  transform: rotate(180deg);
+}
+
+.sw-mods__summary {
+  margin-left: auto;
+  font-weight: 450;
+  color: var(--sw-accent);
+  max-width: 170px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sw-mods__body {
+  display: none;
+  padding: 2px 12px 11px;
+  max-height: 190px;
+  overflow-y: auto;
+}
+
+.sw-mods[data-open='true'] .sw-mods__body {
+  display: block;
+}
+
+/* Label above rather than beside, so the chips get the panel's full width and
+   stop wrapping onto a ragged second line. */
+.sw-mod-row {
+  padding: 5px 0;
+}
+
+.sw-mod-row__label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 10px;
+  font-weight: 640;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sw-fg-muted);
+}
+
+.sw-mod-row .sw-select + .sw-select {
+  margin-left: 6px;
+}
+
+.sw-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.sw-chip {
+  padding: 3px 8px;
+  border: 1px solid var(--sw-border);
+  border-radius: 999px;
+  background: var(--sw-bg);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.sw-chip:hover {
+  border-color: var(--sw-accent);
+}
+
+.sw-chip[data-selected='true'] {
+  background: var(--sw-accent);
+  border-color: var(--sw-accent);
+  color: #fff;
+}
+
+/* --------------------------------------------------------- multiplexer --- */
+
+/* The assistant you are already talking to. Shown rather than hidden so the
+   list does not silently change shape from one site to the next. */
+.sw-chip[data-here='true'] {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.sw-chip[data-here='true']:hover {
+  border-color: var(--sw-border);
+}
+
+.sw-mux__hint {
+  margin-top: 7px;
+  font-size: 10.5px;
+  line-height: 1.45;
+  color: var(--sw-fg-muted);
+}
+
+.sw-mux__add {
+  margin-top: 6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 10.5px;
+  font-weight: 560;
+  color: var(--sw-accent);
+  cursor: pointer;
+}
+
+.sw-mux__add:hover {
+  text-decoration: underline;
+}
+
+.sw-select {
+  height: 25px;
+  padding: 0 6px;
+  border: 1px solid var(--sw-border);
+  border-radius: 7px;
+  background: var(--sw-bg);
+  font-size: 11px;
+  cursor: pointer;
+  max-width: 128px;
+}
+
+/* --------------------------------------------------------------- toast --- */
+
+.sw-toast {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 13px;
+  border-radius: 999px;
+  background: var(--sw-toast-bg);
+  color: var(--sw-toast-fg);
+  font-size: 12px;
+  font-weight: 520;
+  box-shadow: var(--sw-shadow);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.sw-toast[data-visible='true'] {
+  opacity: 1;
+  transform: none;
+}
+
+.sw-toast[hidden] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sw-pill,
+  .sw-panel,
+  .sw-toast,
+  .sw-mods__chevron {
+    transition: none;
+  }
+}
