@@ -1,0 +1,1159 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Stylespec — set the response style of any AI chat</title>
+    <meta
+      name="description"
+      content="One click sets the response style of ChatGPT, Claude, Gemini or any AI chat: ASD-STE100, BLUF, plain language. 23 style guides, no tracking."
+    />
+    <link rel="canonical" href="https://bilal62.github.io/stylespec/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Stylespec — set the response style of any AI chat" />
+    <meta
+      property="og:description"
+      content="One click sets the response style of ChatGPT, Claude, Gemini or any AI chat: ASD-STE100, BLUF, plain language. 23 style guides, no tracking."
+    />
+    <meta property="og:url" content="https://bilal62.github.io/stylespec/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%236366f1'/%3E%3Cpath d='M9 11h14M9 16h10M9 21h6' stroke='white' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E"
+    />
+    <style>
+      :root {
+        --accent: #6366f1;
+        --accent-strong: #4f46e5;
+        --accent-soft: rgba(99, 102, 241, 0.1);
+        --bg: #ffffff;
+        --bg-soft: #f6f7fb;
+        --fg: #16181d;
+        --fg-muted: #6b7180;
+        --border: rgba(16, 18, 27, 0.11);
+        --radius: 14px;
+        --measure: 66ch;
+        color-scheme: light;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --accent: #818cf8;
+          --accent-strong: #a5b4fc;
+          --accent-soft: rgba(129, 140, 248, 0.14);
+          --bg: #14161c;
+          --bg-soft: #1b1d24;
+          --fg: #eceef4;
+          --fg-muted: #9aa1b1;
+          --border: rgba(255, 255, 255, 0.12);
+          color-scheme: dark;
+        }
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto,
+          'Helvetica Neue', Arial, sans-serif;
+        font-size: 17px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      a {
+        color: var(--accent-strong);
+      }
+
+      .wrap {
+        width: 100%;
+        max-width: 1060px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      /* ------------------------------------------------------------- nav -- */
+
+      header.nav {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: color-mix(in srgb, var(--bg) 88%, transparent);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .nav__inner {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        height: 60px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-weight: 640;
+        letter-spacing: -0.01em;
+        text-decoration: none;
+        color: var(--fg);
+      }
+
+      .brand__mark {
+        width: 24px;
+        height: 24px;
+        border-radius: 7px;
+        background: var(--accent);
+        display: grid;
+        place-items: center;
+        flex: none;
+      }
+
+      .nav__spacer {
+        flex: 1;
+      }
+
+      .nav__link {
+        color: var(--fg-muted);
+        text-decoration: none;
+        font-size: 14.5px;
+        font-weight: 520;
+      }
+
+      .nav__link:hover {
+        color: var(--fg);
+      }
+
+      /* --------------------------------------------------------- sections -- */
+
+      section {
+        padding: 84px 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      section:last-of-type {
+        border-bottom: 0;
+      }
+
+      h1,
+      h2,
+      h3 {
+        letter-spacing: -0.022em;
+        line-height: 1.15;
+        margin: 0;
+      }
+
+      h1 {
+        font-size: clamp(2.3rem, 6vw, 3.6rem);
+        font-weight: 680;
+      }
+
+      h2 {
+        font-size: clamp(1.6rem, 3.6vw, 2.15rem);
+        font-weight: 650;
+      }
+
+      h3 {
+        font-size: 1.05rem;
+        font-weight: 620;
+      }
+
+      p {
+        margin: 0;
+        max-width: var(--measure);
+      }
+
+      .eyebrow {
+        font-size: 12.5px;
+        font-weight: 640;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        color: var(--accent-strong);
+        margin: 0 0 14px;
+      }
+
+      .lede {
+        font-size: 1.16rem;
+        color: var(--fg-muted);
+      }
+
+      .stack {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      /* ------------------------------------------------------------ hero -- */
+
+      .hero {
+        padding: 96px 0 84px;
+      }
+
+      .hero h1 {
+        max-width: 20ch;
+      }
+
+      .hero__sub {
+        font-size: 1.24rem;
+        color: var(--fg-muted);
+        max-width: 56ch;
+      }
+
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 14px;
+        margin-top: 6px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        height: 46px;
+        padding: 0 22px;
+        border-radius: 999px;
+        font-size: 15.5px;
+        font-weight: 600;
+        text-decoration: none;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: background 130ms ease, border-color 130ms ease, color 130ms ease;
+      }
+
+      .btn--primary {
+        background: var(--accent);
+        color: #fff;
+      }
+
+      .btn--primary:hover {
+        background: var(--accent-strong);
+      }
+
+      .btn--ghost {
+        border-color: var(--border);
+        color: var(--fg);
+        background: transparent;
+      }
+
+      .btn--ghost:hover {
+        background: var(--bg-soft);
+        border-color: var(--accent);
+      }
+
+      .trust {
+        font-size: 14px;
+        color: var(--fg-muted);
+        margin-top: 4px;
+      }
+
+      .note-pending {
+        font-size: 13.5px;
+        color: var(--fg-muted);
+        border-left: 2px solid var(--border);
+        padding-left: 12px;
+        margin-top: 10px;
+        max-width: 56ch;
+      }
+
+      /* ------------------------------------------------------ before/after -- */
+
+      .compare {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+        margin-top: 34px;
+      }
+
+      @media (max-width: 760px) {
+        .compare {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .panel {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--bg-soft);
+        padding: 18px;
+        min-width: 0;
+      }
+
+      .panel__label {
+        font-size: 11.5px;
+        font-weight: 660;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--fg-muted);
+        margin-bottom: 10px;
+      }
+
+      .panel--after {
+        border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+        background: var(--accent-soft);
+      }
+
+      .panel--after .panel__label {
+        color: var(--accent-strong);
+      }
+
+      .panel p {
+        font-size: 14.5px;
+        margin: 0 0 10px;
+        max-width: none;
+      }
+
+      .panel p:last-child {
+        margin-bottom: 0;
+      }
+
+      .panel--default {
+        max-height: 260px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .panel--default::after {
+        content: '';
+        position: absolute;
+        inset: auto 0 0 0;
+        height: 76px;
+        background: linear-gradient(to bottom, transparent, var(--bg-soft));
+      }
+
+      /* ----------------------------------------------------------- steps -- */
+
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 22px;
+        margin-top: 34px;
+        counter-reset: step;
+      }
+
+      @media (max-width: 760px) {
+        .steps {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .step {
+        border-top: 2px solid var(--accent);
+        padding-top: 16px;
+      }
+
+      .step__n {
+        font-size: 12.5px;
+        font-weight: 660;
+        color: var(--accent-strong);
+        margin-bottom: 6px;
+      }
+
+      .step p {
+        font-size: 15px;
+        color: var(--fg-muted);
+        margin-top: 6px;
+      }
+
+      /* ---------------------------------------------------------- styles -- */
+
+      .styles {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(268px, 1fr));
+        gap: 16px;
+        margin-top: 34px;
+      }
+
+      .style {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px 18px;
+        background: var(--bg);
+      }
+
+      .style__top {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+
+      .style h3 {
+        font-size: 15.5px;
+      }
+
+      .style__std {
+        font-size: 10.5px;
+        font-weight: 680;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--accent-strong);
+        background: var(--accent-soft);
+        border-radius: 999px;
+        padding: 2px 8px;
+        white-space: nowrap;
+      }
+
+      .style p {
+        font-size: 14.5px;
+        color: var(--fg-muted);
+        max-width: none;
+      }
+
+      .more-styles {
+        margin-top: 22px;
+        font-size: 15px;
+        color: var(--fg-muted);
+      }
+
+      /* ------------------------------------------------------------ hosts -- */
+
+      .hosts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 30px;
+      }
+
+      .host {
+        font-size: 13.5px;
+        font-weight: 540;
+        color: var(--fg-muted);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 5px 13px;
+      }
+
+      /* ------------------------------------------------------------ twoup -- */
+
+      .twoup {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 22px;
+        margin-top: 32px;
+      }
+
+      @media (max-width: 760px) {
+        .twoup {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .twoup > div {
+        border-left: 2px solid var(--accent);
+        padding-left: 16px;
+      }
+
+      .twoup p {
+        font-size: 15px;
+        color: var(--fg-muted);
+        margin-top: 8px;
+        max-width: none;
+      }
+
+      /* ------------------------------------------------------------ table -- */
+
+      .table-scroll {
+        overflow-x: auto;
+        margin-top: 30px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 15px;
+        min-width: 520px;
+      }
+
+      th,
+      td {
+        text-align: left;
+        padding: 13px 14px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      thead th {
+        font-size: 12px;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        color: var(--fg-muted);
+        font-weight: 640;
+      }
+
+      tbody th {
+        font-weight: 560;
+        color: var(--fg-muted);
+      }
+
+      td:last-child {
+        color: var(--fg);
+        font-weight: 540;
+      }
+
+      /* -------------------------------------------------------------- faq -- */
+
+      .faq {
+        margin-top: 30px;
+        max-width: var(--measure);
+      }
+
+      details {
+        border-bottom: 1px solid var(--border);
+        padding: 16px 0;
+      }
+
+      summary {
+        cursor: pointer;
+        font-weight: 580;
+        font-size: 16px;
+        list-style: none;
+        display: flex;
+        gap: 12px;
+        align-items: baseline;
+      }
+
+      summary::-webkit-details-marker {
+        display: none;
+      }
+
+      summary::before {
+        content: '+';
+        color: var(--accent-strong);
+        font-weight: 700;
+        flex: none;
+      }
+
+      details[open] summary::before {
+        content: '\2212';
+      }
+
+      details p {
+        margin-top: 10px;
+        color: var(--fg-muted);
+        font-size: 15.5px;
+        padding-left: 24px;
+      }
+
+      /* ----------------------------------------------------------- closing -- */
+
+      .closing {
+        text-align: center;
+        padding: 96px 0;
+      }
+
+      .closing h2 {
+        margin-bottom: 26px;
+      }
+
+      .closing .cta-row {
+        justify-content: center;
+      }
+
+      footer {
+        border-top: 1px solid var(--border);
+        padding: 34px 0 48px;
+        font-size: 13.5px;
+        color: var(--fg-muted);
+      }
+
+      footer .stack {
+        gap: 12px;
+      }
+
+      footer a {
+        color: var(--fg-muted);
+      }
+
+      .legal {
+        max-width: 78ch;
+        font-size: 12.5px;
+        line-height: 1.6;
+      }
+
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.88em;
+        background: var(--bg-soft);
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        padding: 1px 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="nav">
+      <div class="wrap nav__inner">
+        <a class="brand" href="#top">
+          <span class="brand__mark" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 32 32" fill="none">
+              <path
+                d="M9 11h14M9 16h10M9 21h6"
+                stroke="white"
+                stroke-width="3"
+                stroke-linecap="round"
+              />
+            </svg>
+          </span>
+          Stylespec
+        </a>
+        <span class="nav__spacer"></span>
+        <a class="nav__link" href="#styles">Styles</a>
+        <a class="nav__link" href="#privacy">Privacy</a>
+        <a class="nav__link" href="https://github.com/bilal62/stylespec">Source</a>
+      </div>
+    </header>
+
+    <main id="top">
+      <!-- ------------------------------------------------------------ hero -->
+      <section class="hero">
+        <div class="wrap stack">
+          <h1>Stop retyping &ldquo;be concise&rdquo;.</h1>
+          <p class="hero__sub">
+            Stylespec puts your response style one click from every AI chat box —
+            real style guides, not moods — and sends the same styled prompt to a
+            second assistant when one answer is not enough.
+          </p>
+          <div class="cta-row">
+            <a class="btn btn--primary" href="https://github.com/bilal62/stylespec#install">
+              Install from source
+            </a>
+            <a class="btn btn--ghost" href="https://github.com/bilal62/stylespec">
+              View the source
+            </a>
+          </div>
+          <p class="trust">
+            No broad site access. No network requests. No accounts. Open source.
+          </p>
+          <p class="note-pending">
+            The Chrome Web Store listing is in review. Until it is live, the
+            folder loads unpacked in Chrome, Brave, Edge or Arc with no build
+            step.
+          </p>
+        </div>
+      </section>
+
+      <!-- --------------------------------------------------------- problem -->
+      <section>
+        <div class="wrap">
+          <p class="eyebrow">The problem</p>
+          <h2>Every assistant has the same voice</h2>
+          <div class="stack" style="margin-top: 18px">
+            <p class="lede">
+              Long. Hedged. Bulleted. It repeats your question back to you, then
+              offers to help further.
+            </p>
+            <p class="lede">
+              That is the right default when one voice has to serve everybody. It
+              is the wrong one for you, on the fortieth prompt of the day, when
+              you already know what you asked.
+            </p>
+            <p class="lede">
+              So you type &ldquo;be concise&rdquo; at the end. And &ldquo;no
+              bullet points&rdquo;. And &ldquo;just the code&rdquo;. Every time,
+              in every tool, and never once does it stick.
+            </p>
+          </div>
+
+          <div class="compare">
+            <div class="panel panel--default">
+              <div class="panel__label">Default</div>
+              <p>
+                Great question! Centering a <code>div</code> is one of those
+                tasks that seems simple but has a surprising amount of nuance
+                depending on your specific use case and the CSS layout model you
+                are working within.
+              </p>
+              <p>
+                Before we dive in, it is worth understanding that there are
+                several approaches available to us, each with their own tradeoffs
+                in terms of browser support, maintainability, and flexibility.
+                Let us walk through them together.
+              </p>
+              <p>
+                First, we should consider whether you need to center
+                horizontally, vertically, or both. This distinction matters
+                because historically, horizontal centering has been
+                straightforward while vertical centering was notoriously
+                difficult&hellip;
+              </p>
+              <p>
+                Option 1: Flexbox. Flexbox is a one-dimensional layout method
+                that has become widely supported across all modern browsers&hellip;
+              </p>
+            </div>
+            <div class="panel panel--after">
+              <div class="panel__label">Answer first</div>
+              <p><code>display: grid; place-items: center;</code> on the parent.</p>
+              <p>
+                Parent needs a height for vertical centering to be visible. Use
+                <code>place-content: center</code> instead if the child should
+                keep its own size.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ----------------------------------------------------- how it works -->
+      <section>
+        <div class="wrap">
+          <p class="eyebrow">How it works</p>
+          <h2>Three seconds, once</h2>
+          <div class="steps">
+            <div class="step">
+              <div class="step__n">01</div>
+              <h3>Type your question</h3>
+              <p>
+                Anywhere. The pill appears next to the box on your first
+                keystroke.
+              </p>
+            </div>
+            <div class="step">
+              <div class="step__n">02</div>
+              <h3>Pick a style</h3>
+              <p>
+                23 built in, or write your own. Stack length, formality,
+                audience, emoji and language on top.
+              </p>
+            </div>
+            <div class="step">
+              <div class="step__n">03</div>
+              <h3>Send</h3>
+              <p>
+                The instruction lands in your draft, in plain sight, where you
+                can still edit it.
+              </p>
+            </div>
+          </div>
+          <p class="more-styles">
+            <strong>Nothing is added behind your back.</strong> You see every
+            word before it goes.
+          </p>
+        </div>
+      </section>
+
+      <!-- ---------------------------------------------------------- styles -->
+      <section id="styles">
+        <div class="wrap">
+          <p class="eyebrow">Styles</p>
+          <h2>The style guides you actually wanted</h2>
+          <p class="lede" style="margin-top: 16px">
+            Five of them are published standards rather than preferences. Those
+            apply the written rules of each guide.
+          </p>
+
+          <div class="styles">
+            <div class="style">
+              <div class="style__top">
+                <h3>Simplified Technical English</h3>
+                <span class="style__std">ASD-STE100</span>
+              </div>
+              <p>
+                One approved meaning per word, sentences under twenty words, one
+                instruction per sentence.
+              </p>
+            </div>
+            <div class="style">
+              <div class="style__top">
+                <h3>BLUF</h3>
+                <span class="style__std">Standard</span>
+              </div>
+              <p>
+                Bottom line up front, at most three supporting bullets, under 150
+                words.
+              </p>
+            </div>
+            <div class="style">
+              <div class="style__top">
+                <h3>Plain language</h3>
+                <span class="style__std">plainlanguage.gov</span>
+              </div>
+              <p>
+                Short sentences, common everyday words, active voice, most
+                important information first.
+              </p>
+            </div>
+            <div class="style">
+              <div class="style__top"><h3>No LLM tells</h3></div>
+              <p>
+                No em dashes. No &ldquo;delve&rdquo;, no &ldquo;tapestry&rdquo;,
+                no &ldquo;testament to&rdquo;. No closing paragraph summarising
+                the paragraph above it.
+              </p>
+            </div>
+            <div class="style">
+              <div class="style__top"><h3>Put the fries in the bag</h3></div>
+              <p>
+                Answer first. No preamble, no restatement, no &ldquo;great
+                question&rdquo;. When it has answered, it stops.
+              </p>
+            </div>
+            <div class="style">
+              <div class="style__top"><h3>Terse senior engineer</h3></div>
+              <p>
+                Code and commands first. Prose only where it carries something
+                the code cannot.
+              </p>
+            </div>
+            <div class="style">
+              <div class="style__top"><h3>Explain it like I&rsquo;m 5</h3></div>
+              <p>
+                Everyday words and one concrete analogy, held all the way
+                through.
+              </p>
+            </div>
+            <div class="style">
+              <div class="style__top"><h3>Devil&rsquo;s advocate</h3></div>
+              <p>
+                Assumes your idea is flawed and finds the strongest reasons why.
+                Leads with the failure most likely to actually happen.
+              </p>
+            </div>
+            <div class="style">
+              <div class="style__top"><h3>Socratic tutor</h3></div>
+              <p>
+                Refuses to answer. Asks the one question that moves you forward,
+                and waits.
+              </p>
+            </div>
+          </div>
+
+          <p class="more-styles">
+            Plus Feynman, Hemingway, the Google and Microsoft documentation house
+            styles, Academic, Legalese, Financial analyst, Checklist, Bullets
+            only, Table first — and Pirate, Shakespearean, Corporate LinkedIn and
+            Gen Z, which stay accurate underneath the accent.
+          </p>
+          <p class="more-styles">
+            <strong>Write your own in thirty seconds.</strong> Name it, type the
+            instruction, star it to pin it to the top.
+          </p>
+        </div>
+      </section>
+
+      <!-- ------------------------------------------------------- everywhere -->
+      <section>
+        <div class="wrap">
+          <p class="eyebrow">Everywhere</p>
+          <h2>Your styles outlive your favourite assistant</h2>
+          <div class="hosts">
+            <span class="host">ChatGPT</span><span class="host">Claude</span>
+            <span class="host">Gemini</span><span class="host">Copilot</span>
+            <span class="host">Perplexity</span><span class="host">Grok</span>
+            <span class="host">DeepSeek</span><span class="host">Mistral</span>
+            <span class="host">Poe</span><span class="host">Meta AI</span>
+            <span class="host">Kimi</span><span class="host">Qwen</span>
+            <span class="host">Groq</span><span class="host">Together</span>
+            <span class="host">LMArena</span><span class="host">Hugging Face Chat</span>
+            <span class="host">Phind</span><span class="host">You.com</span>
+            <span class="host">OpenRouter</span><span class="host">AI Studio</span>
+            <span class="host">NotebookLM</span><span class="host">T3 Chat</span>
+            <span class="host">Open WebUI</span><span class="host">LibreChat</span>
+          </div>
+          <p class="lede" style="margin-top: 26px">
+            Those are the ones recognised by name. Stylespec finds chat boxes by
+            how they look and behave, not by a list of domains — so your
+            company&rsquo;s internal assistant, your self-hosted front-end, and
+            whatever launches next month generally work on day one.
+          </p>
+        </div>
+      </section>
+
+      <!-- ------------------------------------------------------ multiplexer -->
+      <section>
+        <div class="wrap">
+          <p class="eyebrow">Multiplexer</p>
+          <h2>One tick, and a second assistant is already answering</h2>
+          <div class="stack" style="margin-top: 18px">
+            <p class="lede">
+              Some questions deserve more than one answer, and getting a second
+              one means selecting your prompt, copying it, opening a tab,
+              pasting it, sending. Every time.
+            </p>
+            <p class="lede">
+              Tick ChatGPT or Claude in the picker and just send. Each opens in a
+              background tab to the right, already asking your question, with
+              your style instruction attached. You never leave the tab you were
+              in.
+            </p>
+          </div>
+
+          <div class="twoup">
+            <div>
+              <h3>It starts where you already are.</h3>
+              <p>
+                The side-by-side tools are a destination — you type into their
+                box instead of your assistant&rsquo;s, abandoning the
+                conversation you were already in. Stylespec works the other way
+                round. It sends the draft you had already written, from the site
+                you were already on.
+              </p>
+            </div>
+            <div>
+              <h3>The comparison is actually fair.</h3>
+              <p>
+                Two answers are only comparable if the prompt was identical, and
+                prompt shape drives answer shape more than people expect. The
+                same style instruction goes to both, so you are comparing the
+                models — not one model&rsquo;s default verbosity against
+                another&rsquo;s.
+              </p>
+            </div>
+          </div>
+
+          <p class="note-pending" style="margin-top: 26px; max-width: 72ch">
+            ChatGPT and Claude built in; add any assistant that takes a prompt in
+            its address, including an internal one. Answers arrive in normal tabs
+            on each assistant&rsquo;s own site — there is no split-screen pane,
+            and nothing is read back or scored for you.
+          </p>
+        </div>
+      </section>
+
+      <!-- ------------------------------------------------- the alternative -->
+      <section>
+        <div class="wrap">
+          <p class="eyebrow">Against the alternative</p>
+          <h2>&ldquo;Doesn&rsquo;t ChatGPT already do this?&rdquo;</h2>
+          <p class="lede" style="margin-top: 16px">
+            It does, inside ChatGPT, for every message, until you go and change
+            it. Which is genuinely useful, and not the same thing.
+          </p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col"></th>
+                  <th scope="col">Vendor settings</th>
+                  <th scope="col">Stylespec</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Works on</th>
+                  <td>One assistant</td>
+                  <td>Every assistant</td>
+                </tr>
+                <tr>
+                  <th scope="row">Applies</th>
+                  <td>To every message</td>
+                  <td>To this message</td>
+                </tr>
+                <tr>
+                  <th scope="row">Switching style</th>
+                  <td>Open settings, edit, save</td>
+                  <td>One click</td>
+                </tr>
+                <tr>
+                  <th scope="row">Keeping them in sync</th>
+                  <td>Three tools, three copies</td>
+                  <td>One library</td>
+                </tr>
+                <tr>
+                  <th scope="row">What it adds</th>
+                  <td>Hidden in the system prompt</td>
+                  <td>Visible in your draft</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="lede" style="margin-top: 26px">
+            Most people reading this have three assistants open right now. That
+            is the whole argument.
+          </p>
+        </div>
+      </section>
+
+      <!-- --------------------------------------------------------- privacy -->
+      <section id="privacy">
+        <div class="wrap">
+          <p class="eyebrow">Privacy</p>
+          <h2>It cannot run where you have not let it</h2>
+          <div class="stack" style="margin-top: 18px">
+            <p class="lede">
+              Install almost any extension like this and Chrome warns you it can
+              &ldquo;read and change all your data on all websites&rdquo;.
+              Stylespec never asks for that.
+            </p>
+            <p class="lede">
+              It runs on the assistant sites you would expect, and nowhere else.
+              Anything beyond that is one explicit click, granting one site at a
+              time.
+            </p>
+            <p class="lede">
+              That is unusual for anything that talks to several assistants at
+              once, which normally needs standing access to all of them.
+              Stylespec passes the prompt in the address bar instead, so for most
+              targets it injects nothing at all.
+            </p>
+            <p class="lede">
+              No network requests. No analytics, no telemetry, no accounts, no
+              remote code. Your prompts are read by the site you typed them into
+              and by nothing else. Your styles sit in your browser&rsquo;s own
+              sync storage.
+            </p>
+            <p class="lede">
+              Your AI chats are among the most revealing text you produce —
+              half-formed ideas, code you have not shipped, things you would not
+              ask a colleague. An extension that watches that is a serious thing
+              to install. This one is incapable of it, and you do not have to
+              take that on faith.
+            </p>
+          </div>
+          <div class="cta-row" style="margin-top: 26px">
+            <a
+              class="btn btn--ghost"
+              href="https://github.com/bilal62/stylespec/blob/main/manifest.json"
+            >
+              Read the manifest — it&rsquo;s 92 lines
+            </a>
+            <a class="btn btn--ghost" href="privacy.html">Full privacy policy</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ------------------------------------------------------------- faq -->
+      <section>
+        <div class="wrap">
+          <p class="eyebrow">FAQ</p>
+          <h2>Questions people actually ask</h2>
+          <div class="faq">
+            <details open>
+              <summary>Does this make the AI smarter?</summary>
+              <p>
+                No, and anything claiming otherwise is selling something. The
+                substance stays the model&rsquo;s. Stylespec changes the shape it
+                arrives in — which, most days, is the part costing you time.
+              </p>
+            </details>
+            <details>
+              <summary>
+                How is the Multiplexer different from the side-by-side
+                comparison extensions?
+              </summary>
+              <p>
+                Those are dashboards, and several are good. If you want every
+                model in one window with the answers collected for you, use one
+                of them. Stylespec is the assistant you already had open, plus a
+                tick box that saves you the copy and paste — and it is the only
+                one that sends the same style instruction to both sides, which is
+                what makes two answers comparable at all.
+              </p>
+            </details>
+            <details>
+              <summary>Is this an ASD-STE100 compliance tool?</summary>
+              <p>
+                No. ASD-STE100 has two parts, a set of writing rules and a
+                controlled dictionary. Stylespec applies the writing rules as an
+                instruction to the model. It does not check output against the
+                official dictionary, so it is a drafting aid rather than a
+                compliance checker.
+              </p>
+            </details>
+            <details>
+              <summary>Can it send to Gemini, Perplexity or Grok?</summary>
+              <p>
+                Add them in Settings, along with anything else that takes a
+                prompt in its address. The built-in list is short deliberately:
+                those addresses are undocumented and can change without warning,
+                so each one shipped is a maintenance promise rather than a line
+                on a feature list.
+              </p>
+            </details>
+            <details>
+              <summary>Will it break when ChatGPT redesigns?</summary>
+              <p>
+                Probably not. Site-specific rules are only confidence boosts; the
+                detection underneath looks at the shape of the page. That is why
+                unreleased assistants tend to work already.
+              </p>
+            </details>
+            <details>
+              <summary>It didn&rsquo;t appear on my assistant.</summary>
+              <p>
+                Open the toolbar popup and hit <strong>Turn it on here</strong>.
+                Chrome will ask permission for that one site, and detection takes
+                over from there. Then please open an issue — a miss is a bug worth
+                fixing, and fixing one usually fixes a class.
+              </p>
+            </details>
+            <details>
+              <summary>Doesn&rsquo;t a longer prompt cost more tokens?</summary>
+              <p>
+                A style block is 40 to 70 words and removes several hundred words
+                of output. It nets out cheaper, in tokens and in reading time.
+              </p>
+            </details>
+            <details>
+              <summary>Can I use it for work?</summary>
+              <p>
+                Yes. No data leaves the machine, so there is nothing for a
+                security review to object to. Point them at the source.
+              </p>
+            </details>
+            <details>
+              <summary>Firefox? Safari?</summary>
+              <p>
+                Not yet. The code is standard Manifest V3, so a Firefox build is
+                mostly packaging. Open an issue if you want it and it moves up the
+                list.
+              </p>
+            </details>
+            <details>
+              <summary>What does it cost?</summary>
+              <p>Nothing. No paid tier is planned, no accounts, no upsell.</p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------------------------------------------------------- closing -->
+      <section class="closing">
+        <div class="wrap">
+          <h2>Set the style once. Use it everywhere.</h2>
+          <div class="cta-row">
+            <a class="btn btn--primary" href="https://github.com/bilal62/stylespec#install">
+              Install from source
+            </a>
+            <a class="btn btn--ghost" href="https://github.com/bilal62/stylespec">
+              View the source
+            </a>
+          </div>
+          <p class="trust" style="margin-top: 18px">
+            Open source · No broad site access · No tracking
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap stack">
+        <div>
+          <a href="https://github.com/bilal62/stylespec">GitHub</a> ·
+          <a href="privacy.html">Privacy policy</a> ·
+          <a href="https://github.com/bilal62/stylespec/issues">Report a detection bug</a>
+        </div>
+        <p class="legal">
+          Simplified Technical English and ASD-STE100 are specifications of ASD.
+          Microsoft is a trademark of Microsoft Corporation. Google and Gemini
+          are trademarks of Google LLC. ChatGPT is a trademark of OpenAI. Claude
+          is a trademark of Anthropic. Stylespec is not affiliated with, endorsed
+          by or authorised by any of them.
+        </p>
+        <p class="legal">MIT licensed.</p>
+      </div>
+    </footer>
+  </body>
+</html>
