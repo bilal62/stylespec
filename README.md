@@ -39,8 +39,12 @@ opens in a background tab, already asking — see
 
 ## Install
 
-**From the Chrome Web Store** — [link pending review]. Works in Chrome, Brave,
-Edge, Arc and other Chromium browsers.
+**From the Chrome Web Store** — pending review. Works in Chrome, Brave, Edge,
+Arc and other Chromium browsers. In the meantime the folder loads unpacked, with
+no build step, using the steps below.
+
+Website: [bilal62.github.io/stylespec](https://bilal62.github.io/stylespec/) ·
+[Privacy policy](https://bilal62.github.io/stylespec/privacy.html)
 
 **From source** — there is no build step, so the folder loads as-is:
 
@@ -279,6 +283,7 @@ node scripts/build-css.mjs     # regenerate src/content/ui.css.js after editing 
 python3 scripts/make-icons.py  # regenerate icons/
 node scripts/package.mjs       # build dist/stylespec-<version>.zip for the Chrome Web Store
 node marketing/check-limits.mjs # store copy against the field limits that reject a submission
+node scripts/capture-screenshots.mjs # regenerate marketing/screenshots at 1280x800
 ```
 
 `package.mjs` ships only runtime files — no harnesses, scripts or marketing
@@ -321,6 +326,7 @@ src/options/                  settings page
 src/popup/                    toolbar popup
 src/background/               shortcut routing, granted origins, fan-out
 scripts/                      self-test, css bundler, icon generator, harnesses
+docs/                         landing page and privacy policy, served by Pages
 marketing/                    positioning, store listing, launch copy
 ```
 

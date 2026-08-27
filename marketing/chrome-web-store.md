@@ -263,7 +263,7 @@ extension is structurally able to do, and you can verify it: the source is
 public, the manifest is 92 lines, and the whole thing is small enough to read
 in an evening.
 
-Open source: [REPO URL]
+Open source: https://github.com/bilal62/stylespec
 
 
 FREQUENTLY ASKED
@@ -342,6 +342,34 @@ The previous image four — the same pill on Claude and Gemini, captioned *"One
 library, every assistant."* — is cut to make room, and its argument is carried by
 image three's caption plus the description. If a sixth slot is ever used, that is
 the one to restore.
+
+### What is already captured
+
+`node scripts/capture-screenshots.mjs` regenerates everything that can be
+produced without a signed-in assistant. It drives headless Chrome against the
+UI harness and the landing page, pins the viewport to 1280×800, and waits on
+computed opacity rather than a fixed delay, because both the pill and the panel
+fade in and a naive capture catches them half-transparent. Output lands in
+`marketing/screenshots/`.
+
+| File | Covers | Real capture? |
+| --- | --- | --- |
+| `01-pill.png` | Image one, on a neutral composer | Yes, the extension's own UI |
+| `02-picker.png` | Image two, picker open on Favourites | Yes |
+| `02b-picker-standards.png` | Image two, scrolled to the Technical group so ASD-STE100 and the Google guide are visible | Yes |
+| `03-before-after.png` | Image three | No — a rendering of the landing page's comparison panel |
+
+Two honest caveats before these go up. `03` is an illustration of what the
+styles do, not a screenshot of a model answering, so it should be replaced with
+a genuine capture before submission or it risks reading as a mockup. And `01`
+and `02` are shot against the harness, which is an accurate rendering of the
+extension but a blank page behind it — the versions worth shipping are the same
+two shots taken on a real ChatGPT or Claude window, which is a five-minute job
+once the extension is loaded unpacked.
+
+Images four and five cannot be automated at all: the multiplexer shot needs a
+real tab strip, and the permission shot needs a clean profile going through the
+actual install.
 
 **Small promo tile** — 440×280. Wordmark, the pill, and: *One click. Any AI.
 Your tone.*
@@ -451,4 +479,15 @@ contains no analytics or remote code.
 - Remote code: **No.** All code ships in the package.
 
 A privacy policy URL is required whenever any disclosure is ticked and is worth
-publishing regardless. Point it at the landing page's privacy section.
+publishing regardless. Paste this into the dashboard:
+
+```
+https://bilal62.github.io/stylespec/privacy.html
+```
+
+It is a standalone page rather than an anchor on the landing page, because a
+reviewer checking a policy should not have to scroll past marketing to find it.
+Source is `docs/privacy.html`; it is versioned in git, so what the policy said
+on any given date is public. Move it to the custom domain once one is
+registered, and update the dashboard field in the same sitting — a dead privacy
+policy URL is grounds for removal, not just rejection.

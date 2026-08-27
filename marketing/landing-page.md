@@ -5,6 +5,13 @@ brackets is a build note rather than copy. The page has one job — get the
 install — so there is exactly one call to action, repeated, and no navigation
 that leads away from it.
 
+**Built and live** at https://bilal62.github.io/stylespec/, served by GitHub
+Pages from `docs/` on `main`. The implementation is `docs/index.html`, a single
+dependency-free file matching the extension's own palette, plus
+`docs/privacy.html` for the policy the store requires. Repoint both at the
+custom domain once it is registered. The copy below stays the source of truth:
+edit here first, then the HTML.
+
 Section order matters here and is not arbitrary. The style layer carries the
 hero because it is the hook; the multiplexer sits directly after the
 portability section, while the reader is already thinking about using several
